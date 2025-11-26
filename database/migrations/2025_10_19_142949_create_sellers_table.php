@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('tipo_loja')->nullable(); // ex: roupas, eletrônicos
             $table->enum('origem', ['nacional', 'internacional']);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

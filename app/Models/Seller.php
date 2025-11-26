@@ -11,5 +11,18 @@ class Seller extends Model
 
     protected $table = 'sellers';
     protected $primaryKey = 'id_seller';
-    protected $fillable = ['id_user', 'tipo_loja', 'nacional_internacional'];
+    public $timestamps = true;
+
+    protected $fillable = [
+        'id_user',
+        'nome_loja',
+        'tipo_loja',
+        'origem',
+    ];
+
+    // Cada vendedor pertence a um usuário
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }

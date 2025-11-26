@@ -5,22 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class Admin extends Model
 {
     use HasFactory;
 
-    protected $table = 'customers';
-    protected $primaryKey = 'id_customer';
-    public $timestamps = true;
+    protected $table = 'admins';
+
+    protected $primaryKey = 'id_admin';
 
     protected $fillable = [
         'id_user',
-        'cpf',
-        'endereco',
+        'cargo',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id_user', 'id_user');
+        return $this->belongsTo(User::class, 'id_user');
     }
 }
