@@ -63,6 +63,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 });
 
+// CUSTOMERS
+    Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/customer/profile', [CustomerController::class, 'getCustomer']);
+    Route::put('/customer/update', [CustomerController::class, 'updateCustomer']);
+});
+
 // Rotas acessíveis apenas pelo Admin
     Route::middleware('auth:sanctum')->group(function () {
 

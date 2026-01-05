@@ -65,6 +65,8 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:cliente,vendedor',
+            'cpf' => 'nullable|string|max:20',
+            'endereco' => 'nullable|string|max:255',
         ]);
 
         // Cria usuário
@@ -78,7 +80,9 @@ class AuthController extends Controller
         // Se for cliente
         if ($user->role === 'cliente') {
             Customer::create([
-                'id_user' => $user->id_user
+                'id_user' => $user->id_user, 
+                'cpf' => $request->cpf,
+                'endereco' => $request->endereco,
             ]);
         }
 

@@ -40,12 +40,23 @@ public function atualizarCustomer(Request $request, $id_customer)
         return response()->json(['message' => 'Usuário do cliente não encontrado'], 404);
     }
 
+    // UPDATE users SET name = 'Teste', email = 'teste' WHERE id_user = 18 
+
     $user->update($request->only(['name', 'email']));
 
     $customer->update($request->only(['cpf', 'endereco']));
 
     return response()->json(['message' => 'Cliente atualizado com sucesso']);
 }
+
+    // Mostra um cliente especifico
+    public function showCustomer($id_customer)
+    {
+        //SELECT * FROM customers WHERE id_customer = 3 LIMIT 1
+        $clientes = Customer::with('user')->where('id_customer', $id_customer)->first();
+
+        return response()->json($clientes);
+    }
 
     // Excluir um vendedor
     public function excluirVendedor($id_seller)
