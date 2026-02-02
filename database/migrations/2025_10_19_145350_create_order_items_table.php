@@ -23,7 +23,7 @@ return new class extends Migration
                   ->references('id_product')->on('products')
                   ->onDelete('cascade');
 
-            // FK para o vendedor
+            // FK para o seller
             $table->unsignedBigInteger('id_seller');
             $table->foreign('id_seller')
                   ->references('id_seller')->on('sellers')

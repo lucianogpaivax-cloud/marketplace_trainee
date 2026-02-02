@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id('id_product');  // PK
 
-            // FK para o vendedor
+            // FK para o seller
             $table->unsignedBigInteger('id_seller');
             $table->foreign('id_seller')
                   ->references('id_seller')->on('sellers')

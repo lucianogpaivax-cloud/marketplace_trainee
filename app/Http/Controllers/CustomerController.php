@@ -25,7 +25,7 @@ class CustomerController extends Controller
     ]);
 }
 
-  public function updateCustomer(Request $request)
+    public function updateCustomer(Request $request)
 {
     $user = Auth::user();
     $user = User::where('id_user', $user->id_user)->first();

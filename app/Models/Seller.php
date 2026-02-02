@@ -20,7 +20,16 @@ class Seller extends Model
         'origem',
     ];
 
-    // Cada vendedor pertence a um usuário
+    /**
+     * MUITO IMPORTANTE
+     * Diz ao Laravel qual campo é o ID do usuário
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'id_user';
+    }
+
+    // Cada seller pertence a um usuário
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user');

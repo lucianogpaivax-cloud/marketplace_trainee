@@ -43,7 +43,7 @@ Route::get('/sellers/{id}', [SellerController::class, 'show']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 
-// Rotas protegidas (vendedor autenticado)
+// Rotas protegidas (seller autenticado)
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/seller/products', [ProductController::class, 'myProducts']);
     Route::post('/products', [ProductController::class, 'store']);
@@ -69,24 +69,35 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/customer/update', [CustomerController::class, 'updateCustomer']);
 });
 
+// SELLERS
+    Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/seller/profile', [SellerController::class, 'getSeller']);
+    Route::put('/seller/update', [SellerController::class, 'updateSeller']);
+});
+
 // Rotas acessíveis apenas pelo Admin
     Route::middleware('auth:sanctum')->group(function () {
 
-    // Clientes
-    Route::get('/admin/customers', [AdminController::class, 'listarClientes']);
+    // customers
+    Route::get('/admin/customers', [AdminController::class, 'listarcustomers']);
     Route::get('/admin/customers/{id_customer}', [AdminController::class, 'showCustomer']);
     Route::put('/admin/customers/{id_customer}', [AdminController::class, 'atualizarCustomer']);
     
 
-    // Vendedores
-    Route::get('/admin/sellers', [AdminController::class, 'listarVendedores']);
-    Route::put('/admin/sellers/{id_seller}', [AdminController::class, 'atualizarVendedor']);
-    Route::delete('/admin/sellers/{id_seller}',   [AdminController::class, 'excluirVendedor']);
+    // seller
+    Route::get('/admin/sellers', [AdminController::class, 'listarseller']);
+    Route::put('/admin/sellers/{id_seller}', [AdminController::class, 'atualizarSeller']);
+    Route::delete('/admin/sellers/{id_seller}',   [AdminController::class, 'excluirseller']);
 
 });;
 
-// Rotas acessíveis pelo cliente
+    // Rotas acessíveis pelo customer
     Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/costumer/profile', [CustomerController::class, 'profile']);
-    Route::put('/costumer/profile', [CustomerController::class, 'update']);
+    Route::get('/customer/profile', [CustomerController::class, 'profile']);
+    Route::put('/customer/profile', [CustomerController::class, 'update']);
+});
+
+   // Rotas de produtos
+   Route::middleware(['auth:sanctum'])->group(function () {
+   Route::post('/products', [ProductController::class, 'store']);
 });

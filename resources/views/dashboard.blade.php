@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel do Cliente</title>
+    <title>Painel do customer</title>
 </head>
 <body>
     <h1>Bem-vindo, {{ Auth::user()->name }}</h1>

@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Bem-vindo, {{ Auth::user()->name }}</h1>
-    <p>Aqui você poderá gerenciar vendedores, clientes e relatórios do sistema.</p>
+    <p>Aqui você poderá gerenciar seller, customers e relatórios do sistema.</p>
     <a href="{{ route('logout') }}">Sair</a>
 </body>
 </html>

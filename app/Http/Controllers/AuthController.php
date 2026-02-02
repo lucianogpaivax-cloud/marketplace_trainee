@@ -9,12 +9,15 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\Seller;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     // Exibe o formulário de login
     public function login(Request $request)
 {
+    Log::info('Entrou no método login');
+
     $request->validate([
         'email' => 'required|email',
         'password' => 'required|string',
@@ -35,8 +38,8 @@ class AuthController extends Controller
 
     // Determina o redirecionamento com base na role
     $redirect = match ($user->role) {
-        'cliente'  => '/dashboard-cliente',
-        'vendedor' => '/dashboard-vendedor',
+        'customer'  => '/dashboard-customer',
+        'seller' => '/dashboard-seller',
         'admin'    => '/dashboard-admin',
         default    => '/',
     };
@@ -64,7 +67,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:cliente,vendedor',
+            'role' => 'required|in:customer,seller',
             'cpf' => 'nullable|string|max:20',
             'endereco' => 'nullable|string|max:255',
         ]);
@@ -77,8 +80,8 @@ class AuthController extends Controller
             'role' => $request->role,
         ]);
 
-        // Se for cliente
-        if ($user->role === 'cliente') {
+        // Se for customer
+        if ($user->role === 'customer') {
             Customer::create([
                 'id_user' => $user->id_user, 
                 'cpf' => $request->cpf,
@@ -86,8 +89,8 @@ class AuthController extends Controller
             ]);
         }
 
-        // Se for vendedor
-        if ($user->role === 'vendedor') {
+        // Se for seller
+        if ($user->role === 'seller') {
             Seller::create([
                 'id_user' => $user->id_user,
                 'tipo_loja' => $request->tipo_loja ?? null,
@@ -108,10 +111,10 @@ class AuthController extends Controller
     ], 201);
 
         // Redireciona conforme a role
-        if ($user->role === 'cliente') {
+        if ($user->role === 'customer') {
             return redirect('/dashboard');
-        } elseif ($user->role === 'vendedor') {
-            return redirect('/dashboard-vendedor');
+        } elseif ($user->role === 'seller') {
+            return redirect('/dashboard-seller');
         }
 
         return redirect('/login');

@@ -47,11 +47,11 @@
         <label for="role">Tipo de conta:</label><br>
     <select name="role" id="role" required>
         <option value="">Selecione...</option>
-        <option value="cliente">Cliente</option>
-        <option value="vendedor">Vendedor</option>
+        <option value="customer">customer</option>
+        <option value="seller">seller</option>
     </select><br><br>
 
-        <!-- Campos extras do vendedor -->
+        <!-- Campos extras do seller -->
     <div id="seller-fields" style="display: none;">
         <label for="tipo_loja">Tipo de loja:</label><br>
         <input type="text" name="tipo_loja" id="tipo_loja"><br><br>
@@ -73,7 +73,7 @@
     <script>
 document.getElementById('role').addEventListener('change', function () {
     const sellerFields = document.getElementById('seller-fields');
-    if (this.value === 'vendedor') {
+    if (this.value === 'seller') {
         sellerFields.style.display = 'block';
     } else {
         sellerFields.style.display = 'none';

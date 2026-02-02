@@ -37,14 +37,14 @@ class ProductController extends Controller
     }
 
     /**
-     * Listar produtos do vendedor autenticado
+     * Listar produtos do seller autenticado
      */
     public function myProducts()
     {
         $seller = Seller::where('id_user', Auth::id())->first();
 
         if (!$seller) {
-            return response()->json(['message' => 'Perfil de vendedor não encontrado.'], 404);
+            return response()->json(['message' => 'Perfil de seller não encontrado.'], 404);
         }
 
         $products = Product::with('category')
@@ -62,7 +62,7 @@ class ProductController extends Controller
         $seller = Seller::where('id_user', Auth::id())->first();
 
         if (!$seller) {
-            return response()->json(['message' => 'Apenas vendedores podem cadastrar produtos.'], 403);
+            return response()->json(['message' => 'Apenas seller podem cadastrar produtos.'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -91,14 +91,14 @@ class ProductController extends Controller
     }
 
     /**
-     * Atualizar produto (somente o vendedor dono pode)
+     * Atualizar produto (somente o seller dono pode)
      */
     public function update(Request $request, $id)
     {
         $seller = Seller::where('id_user', Auth::id())->first();
 
         if (!$seller) {
-            return response()->json(['message' => 'Perfil de vendedor não encontrado.'], 404);
+            return response()->json(['message' => 'Perfil de seller não encontrado.'], 404);
         }
 
         $product = Product::where('id_product', $id)
@@ -106,7 +106,7 @@ class ProductController extends Controller
             ->first();
 
         if (!$product) {
-            return response()->json(['message' => 'Produto não encontrado ou não pertence a este vendedor.'], 404);
+            return response()->json(['message' => 'Produto não encontrado ou não pertence a este seller.'], 404);
         }
 
         $validator = Validator::make($request->all(), [
@@ -135,7 +135,7 @@ class ProductController extends Controller
         $seller = Seller::where('id_user', Auth::id())->first();
 
         if (!$seller) {
-            return response()->json(['message' => 'Perfil de vendedor não encontrado.'], 404);
+            return response()->json(['message' => 'Perfil de seller não encontrado.'], 404);
         }
 
         $product = Product::where('id_product', $id)
@@ -143,7 +143,7 @@ class ProductController extends Controller
             ->first();
 
         if (!$product) {
-            return response()->json(['message' => 'Produto não encontrado ou não pertence a este vendedor.'], 404);
+            return response()->json(['message' => 'Produto não encontrado ou não pertence a este seller.'], 404);
         }
 
         $product->delete();

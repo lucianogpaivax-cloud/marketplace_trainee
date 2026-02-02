@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\Route;
 // Route::post('/login', [AuthController::class, 'login']);
 // Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// // cliente
+// // customer
 // Route::get('/dashboard', [AuthController::class, 'dashboard'])->middleware('auth');
 
-// // vendedor
-// Route::get('/dashboard-vendedor', [AuthController::class, 'dashboardVendedor'])->middleware('auth');
+// // seller
+// Route::get('/dashboard-seller', [AuthController::class, 'dashboardseller'])->middleware('auth');
 
 // // admin
 // Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin'])->middleware('auth');

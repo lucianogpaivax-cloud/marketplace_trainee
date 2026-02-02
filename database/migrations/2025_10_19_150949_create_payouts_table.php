@@ -20,13 +20,13 @@ return new class extends Migration
                   ->references('id_order_item')->on('order_items')
                   ->onDelete('cascade');
 
-            // FK para o vendedor
+            // FK para o seller
             $table->unsignedBigInteger('id_seller');
             $table->foreign('id_seller')
                   ->references('id_seller')->on('sellers')
                   ->onDelete('cascade');
 
-            $table->decimal('valor_vendedor', 10, 2);
+            $table->decimal('valor_seller', 10, 2);
             $table->decimal('valor_comissao_marketplace', 10, 2);
             $table->enum('status', ['pendente', 'pago'])->default('pendente');
             $table->timestamp('data_repasse')->nullable();

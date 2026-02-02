@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('telefone')->nullable();
-            $table->enum('role', ['cliente', 'vendedor', 'admin']); // define o papel
+            $table->enum('role', ['customer', 'seller', 'admin']); // define o papel
             $table->timestamps();
         });
     }

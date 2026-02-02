@@ -25,7 +25,7 @@ class Product extends Model
     ];
 
     /**
-     * Relação: produto pertence a um vendedor
+     * Relação: produto pertence a um seller
      */
     public function seller()
     {

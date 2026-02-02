@@ -20,7 +20,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:cliente,vendedor',
+            'role' => 'required|in:customer,seller',
         ]);
 
         $user = User::create([
@@ -30,11 +30,11 @@ class UserController extends Controller
             'role' => $request->role,
         ]);
 
-        if ($user->role === 'cliente') {
+        if ($user->role === 'customer') {
             Customer::create(['id_user' => $user->id_user]);
         }
 
-        if ($user->role === 'vendedor') {
+        if ($user->role === 'seller') {
             Seller::create([
                 'id_user' => $user->id_user,
                 'tipo_loja' => $request->tipo_loja ?? null,

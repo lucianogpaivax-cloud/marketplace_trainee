@@ -55,19 +55,25 @@ class User extends Authenticatable
         ];
     }
 
-    // Relação entre User e Admin
+    /**
+     * ESSENCIAL PARA AUTH COM id_user
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'id_user';
+    }
+
+    // Relações
     public function admin()
-{
-    return $this->hasOne(Admin::class, 'id_user');
-}
+    {
+        return $this->hasOne(Admin::class, 'id_user', 'id_user');
+    }
 
-    // Relação entre User e Customer
     public function customer()
-{
-    return $this->hasOne(Customer::class, 'id_user', 'id_user');
-}
+    {
+        return $this->hasOne(Customer::class, 'id_user', 'id_user');
+    }
 
-    // Relação com Seller (se existir)
     public function seller()
     {
         return $this->hasOne(Seller::class, 'id_user', 'id_user');
