@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string('imagem')->nullable(); // URL ou caminho da imagem
             $table->enum('status', ['ativo', 'inativo'])->default('ativo'); // Status
             $table->timestamps();               // created_at e updated_at
+            $table->softDeletes();
         });
     }
 

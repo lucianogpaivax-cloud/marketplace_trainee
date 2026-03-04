@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductController extends Controller
 {
@@ -27,13 +27,51 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with(['seller', 'category'])->find($id);
+    $user = Auth::user();
 
-        if (!$product) {
-            return response()->json(['message' => 'Produto não encontrado.'], 404);
+    if (!$user) {
+        return response()->json(['message' => 'Usuário não autenticado.'], 401);
+    }
+
+    if ($user->role === 'admin') {
+        $product = Product::where('id_product', $id)->first();
+    } else {
+        if (!$user->seller) {
+            return response()->json([
+                'message' => 'Perfil de seller não encontrado.'
+            ], 404);
         }
 
-        return response()->json($product, 200);
+        $product = Product::where('id_product', $id)
+            ->where('id_seller', $user->seller->id_seller)
+            ->first();
+    }
+
+    if (!$product) {
+        return response()->json([
+            'message' => 'Produto não encontrado.'
+        ], 404);
+    }
+
+    return response()->json($product);
+    }
+
+    /**
+     * Mostrar um produto PUBLICO
+     */
+    public function publicShow($id)
+    {
+    $product = Product::where('id_product', $id)
+        ->where('status', 'ativo')
+        ->first();
+
+    if (!$product) {
+        return response()->json([
+            'message' => 'Produto não encontrado.'
+        ], 404);
+    }
+
+    return response()->json($product);
     }
 
     /**
@@ -41,14 +79,14 @@ class ProductController extends Controller
      */
     public function myProducts()
     {
-        $seller = Seller::where('id_user', Auth::id())->first();
+        $user = Auth::user();
 
-        if (!$seller) {
+        if (!$user || !$user->seller) {
             return response()->json(['message' => 'Perfil de seller não encontrado.'], 404);
         }
 
         $products = Product::with('category')
-            ->where('id_seller', $seller->id_seller)
+            ->where('id_seller', $user->seller->id_seller)
             ->get();
 
         return response()->json($products, 200);
@@ -59,10 +97,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $seller = Seller::where('id_user', Auth::id())->first();
+        $user = Auth::user();
 
-        if (!$seller) {
-            return response()->json(['message' => 'Apenas seller podem cadastrar produtos.'], 403);
+        if (!$user || !$user->seller) {
+            return response()->json([
+                'message' => 'Apenas sellers podem cadastrar produtos.'
+            ], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -71,83 +111,128 @@ class ProductController extends Controller
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric|min:0',
             'imagem' => 'nullable|string|max:255',
-            'status' => 'in:ativo,inativo'
+            'status' => 'nullable|in:ativo,inativo'
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        $product = Product::create(array_merge(
-            $validator->validated(),
-            [
-                'id_seller' => $seller->id_seller,
-                'data_criacao' => now(),
+        try {
+            $product = Product::create([
+                'id_seller' => $user->seller->id_seller,
+                'id_category' => $request->id_category,
+                'nome' => $request->nome,
+                'descricao' => $request->descricao,
+                'preco' => $request->preco,
+                'imagem' => $request->imagem,
                 'status' => $request->status ?? 'ativo',
-            ]
-        ));
+                'created_at' => now(),
+            ]);
 
-        return response()->json(['message' => 'Produto criado com sucesso!', 'product' => $product], 201);
+            return response()->json([
+                'message' => 'Produto criado com sucesso!',
+                'product' => $product
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro interno ao criar produto.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Atualizar produto (somente o seller dono pode)
+     * Atualizar produto
      */
     public function update(Request $request, $id)
-    {
-        $seller = Seller::where('id_user', Auth::id())->first();
+{
+    $user = Auth::user();
 
-        if (!$seller) {
+    if (!$user) {
+        return response()->json(['message' => 'Usuário não autenticado.'], 401);
+    }
+
+    // Se for ADMIN → pode editar qualquer produto
+    if ($user->role === 'admin') {
+        $product = Product::where('id_product', $id)->first();
+    } 
+    // Se for SELLER → só pode editar os próprios
+    else {
+        if (!$user->seller) {
             return response()->json(['message' => 'Perfil de seller não encontrado.'], 404);
         }
 
         $product = Product::where('id_product', $id)
-            ->where('id_seller', $seller->id_seller)
+            ->where('id_seller', $user->seller->id_seller)
             ->first();
-
-        if (!$product) {
-            return response()->json(['message' => 'Produto não encontrado ou não pertence a este seller.'], 404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'id_category' => 'sometimes|exists:categories,id_category',
-            'nome' => 'sometimes|string|max:255',
-            'descricao' => 'nullable|string',
-            'preco' => 'sometimes|numeric|min:0',
-            'imagem' => 'nullable|string|max:255',
-            'status' => 'in:ativo,inativo'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        $product->update($validator->validated());
-
-        return response()->json(['message' => 'Produto atualizado com sucesso!', 'product' => $product], 200);
     }
 
+    if (!$product) {
+        return response()->json(['message' => 'Produto não encontrado.'], 404);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'id_category' => 'sometimes|exists:categories,id_category',
+        'nome' => 'sometimes|string|max:255',
+        'descricao' => 'nullable|string',
+        'preco' => 'sometimes|numeric|min:0',
+        'imagem' => 'nullable|string|max:255',
+        'status' => 'nullable|in:ativo,inativo'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
+    }
+
+    $product->update($validator->validated());
+
+    return response()->json([
+        'message' => 'Produto atualizado com sucesso!',
+        'product' => $product
+    ], 200);
+}
+
     /**
-     * Excluir produto (somente o dono)
+     * Excluir produto
      */
     public function destroy($id)
     {
-        $seller = Seller::where('id_user', Auth::id())->first();
+    $user = Auth::user();
 
-        if (!$seller) {
+    if (!$user) {
+        return response()->json(['message' => 'Usuário não autenticado.'], 401);
+    }
+
+    if ($user->role === 'admin') {
+        $product = Product::where('id_product', $id)->first();
+    } else {
+        if (!$user->seller) {
             return response()->json(['message' => 'Perfil de seller não encontrado.'], 404);
         }
 
         $product = Product::where('id_product', $id)
-            ->where('id_seller', $seller->id_seller)
+            ->where('id_seller', $user->seller->id_seller)
             ->first();
+    }
 
-        if (!$product) {
-            return response()->json(['message' => 'Produto não encontrado ou não pertence a este seller.'], 404);
-        }
+    if (!$product) {
+        return response()->json(['message' => 'Produto não encontrado.'], 404);
+    }
 
-        $product->delete();
+    $product->delete();
 
-        return response()->json(['message' => 'Produto excluído com sucesso.'], 200);
+    return response()->json([
+        'message' => 'Produto excluído com sucesso.'
+    ], 200);
+    }
+
+    public function adminIndex()
+    {
+    $products = Product::with(['seller', 'category'])
+        ->paginate(15);
+
+    return response()->json($products);
     }
 }
