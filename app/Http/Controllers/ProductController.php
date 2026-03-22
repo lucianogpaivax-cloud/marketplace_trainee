@@ -13,13 +13,52 @@ class ProductController extends Controller
     /**
      * Listar todos os produtos ativos (rota pública)
      */
-    public function index()
-    {
-        $products = Product::with(['seller', 'category'])
-            ->where('status', 'ativo')
-            ->paginate(12);
+    public function index(Request $request)
+{
+    $query = Product::with(['seller', 'category'])
+        ->where('status', 'ativo');
 
-        return response()->json($products, 200);
+    // 🔎 Busca por nome ou descrição
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('nome', 'like', "%{$search}%")
+              ->orWhere('descricao', 'like', "%{$search}%");
+        });
+    }
+
+    // Filtro por categoria
+    if ($request->has('category')) {
+        $query->where('id_category', $request->category);
+    }
+
+    // Filtro por preço mínimo
+    if ($request->has('min_price')) {
+        $query->where('preco', '>=', $request->min_price);
+    }
+
+    // Filtro por preço máximo
+    if ($request->has('max_price')) {
+        $query->where('preco', '<=', $request->max_price);
+    }
+
+    // ↕Ordenação
+    if ($request->has('sort')) {
+        if ($request->sort === 'price_asc') {
+            $query->orderBy('preco', 'asc');
+        } elseif ($request->sort === 'price_desc') {
+            $query->orderBy('preco', 'desc');
+        } else {
+            $query->latest();
+        }
+    } else {
+        $query->latest();
+    }
+
+    $products = $query->paginate(12);
+
+    return response()->json($products, 200);
     }
 
     /**
@@ -73,6 +112,24 @@ class ProductController extends Controller
 
     return response()->json($product);
     }
+
+    /**
+     * Na pagina de detalhes de um produto, mostra os produtos relacionados
+     */
+    public function related($id)
+{
+    $product = Product::findOrFail($id);
+
+    $related = Product::where('id_category', $product->id_category)
+        ->where('id_product', '!=', $id)
+        ->where('status', 'ativo')
+        ->limit(4)
+        ->get();
+
+    return response()->json($related);
+}
+
+
 
     /**
      * Listar produtos do seller autenticado

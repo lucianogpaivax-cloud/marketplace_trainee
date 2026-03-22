@@ -119,4 +119,14 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
+    
+    // Logout
+    public function logout(Request $request)
+{
+    $request->user()->currentAccessToken()->delete();
+
+    return response()->json([
+        'message' => 'Logout realizado com sucesso'
+    ]);
+}
 }
