@@ -23,6 +23,7 @@ class Product extends Model
         'preco',
         'imagem',
         'status',
+        'quantidade',
         'created_at',
     ];
 

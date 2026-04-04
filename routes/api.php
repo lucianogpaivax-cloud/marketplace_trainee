@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OrderController;
 
 //
 // Rotas Publicas
@@ -111,4 +112,9 @@ use Illuminate\Support\Facades\Route;
     Route::get('/cart', [CartController::class, 'getCart']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
     Route::delete('/cart/item/{id}', [CartController::class, 'removeItem']);
+
+    // Rotas Checkout
+    Route::middleware('auth:sanctum')->post('/checkout', [OrderController::class, 'checkout']);
+    Route::middleware('auth:sanctum')->get('/orders', [OrderController::class, 'index']);
+    Route::middleware('auth:sanctum')->get('/orders/{id}', [OrderController::class, 'show']);
 });

@@ -168,7 +168,8 @@ class ProductController extends Controller
             'descricao' => 'nullable|string',
             'preco' => 'required|numeric|min:0',
             'imagem' => 'nullable|string|max:255',
-            'status' => 'nullable|in:ativo,inativo'
+            'status' => 'nullable|in:ativo,inativo',
+            'quantidade' => 'required|integer|min:0'
         ]);
 
         if ($validator->fails()) {
@@ -177,14 +178,15 @@ class ProductController extends Controller
 
         try {
             $product = Product::create([
-                'id_seller' => $user->seller->id_seller,
-                'id_category' => $request->id_category,
-                'nome' => $request->nome,
-                'descricao' => $request->descricao,
-                'preco' => $request->preco,
-                'imagem' => $request->imagem,
-                'status' => $request->status ?? 'ativo',
-                'created_at' => now(),
+            'id_seller' => $user->seller->id_seller,
+            'id_category' => $request->id_category,
+            'nome' => $request->nome,
+            'descricao' => $request->descricao,
+            'preco' => $request->preco,
+            'imagem' => $request->imagem,
+            'status' => $request->status ?? 'ativo', // ✅ corrigido
+            'quantidade' => $request->quantidade ?? 0, // ✅ ADICIONADO
+            'created_at' => now(),
             ]);
 
             return response()->json([
@@ -204,7 +206,7 @@ class ProductController extends Controller
      * Atualizar produto
      */
     public function update(Request $request, $id)
-{
+    {
     $user = Auth::user();
 
     if (!$user) {
@@ -236,7 +238,8 @@ class ProductController extends Controller
         'descricao' => 'nullable|string',
         'preco' => 'sometimes|numeric|min:0',
         'imagem' => 'nullable|string|max:255',
-        'status' => 'nullable|in:ativo,inativo'
+        'status' => 'nullable|in:ativo,inativo',
+        'quantidade' => 'sometimes|integer|min:0'
     ]);
 
     if ($validator->fails()) {
